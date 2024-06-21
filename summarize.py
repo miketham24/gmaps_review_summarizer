@@ -18,4 +18,10 @@ async def scrape_reviews(url):
 
     page = await browser.newPage()
     await page.setViewport({"width": 800, "height": 3200})
-    page.goto(url)
+    await page.goto(url)
+    #jftiEf is the class in the reviews div 
+    await page.waitForSelector('.jftiEf')
+    # turns reviews div into a list
+    elements = await page.querySelectorAll('.jftiEf')
+
+asyncio.get_event_loop().run_until_complete(scrape_reviews(url))
