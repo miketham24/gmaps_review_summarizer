@@ -9,12 +9,21 @@ load_dotenv()
 api_key = os.getenv('API_KEY')
 print(api_key)
 
+import webbrowser
+
 url = "https://www.google.com/maps/place/Phnom+Penh+Restaurant/@49.2784175,-123.1085087,15z/data=!3m1!4b1!4m6!3m5!1s0x5486716fe509c2b3:0x4e43d6ef30d0b5df!8m2!3d49.278418!4d-123.0982304!16s%2Fg%2F1td5lcxj?entry=ttu"
+
+# Path to Arc Browser
+arc_path = 'open -a /Applications/Arc.app %s'
+
+# Open the URL using Arc Browser
+webbrowser.get(arc_path).open(url)
+
 
 async def scrape_reviews(url):
     #headless = true as we don't want it to open a browser
     #await as we want line of code to wait until code is executed until going to next step
-    browser = await launch({"headless": True, "args":["--window-size=800,3200"]})
+    browser = await launch({"headless": False, "args":["--window-size=800,3200"]})
 
     page = await browser.newPage()
     await page.setViewport({"width": 800, "height": 3200})
@@ -23,5 +32,12 @@ async def scrape_reviews(url):
     await page.waitForSelector('.jftiEf')
     # turns reviews div into a list
     elements = await page.querySelectorAll('.jftiEf')
+    for element in elements:
+        await page.waitForSelector('.MyEned')
+        snippet = await element.querySelector('.MyEned')
+        text = await page.evaluate('selected => selected.textContent', snippet)
+        print(text)
+    
+    await browser.close()
 
 asyncio.get_event_loop().run_until_complete(scrape_reviews(url))
