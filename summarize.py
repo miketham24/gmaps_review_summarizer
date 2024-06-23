@@ -9,7 +9,7 @@ load_dotenv()
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 genai.configure(api_key=GOOGLE_API_KEY)
 
-url = "https://www.google.com/maps/place/Phnom+Penh+Restaurant/@49.2784175,-123.1085087,15z/data=!3m1!4b1!4m6!3m5!1s0x5486716fe509c2b3:0x4e43d6ef30d0b5df!8m2!3d49.278418!4d-123.0982304!16s%2Fg%2F1td5lcxj?entry=ttu"
+#url = "https://www.google.com/maps/place/Phnom+Penh+Restaurant/@49.2784175,-123.1085087,15z/data=!3m1!4b1!4m6!3m5!1s0x5486716fe509c2b3:0x4e43d6ef30d0b5df!8m2!3d49.278418!4d-123.0982304!16s%2Fg%2F1td5lcxj?entry=ttu"
 
 async def scrape_reviews(url):
     reviews = []
@@ -24,13 +24,16 @@ async def scrape_reviews(url):
     await page.waitForSelector('.jftiEf')
     # turns reviews div into a list
     elements = await page.querySelectorAll('.jftiEf')
+    
     for element in elements:
-        #handles case of review text being super long and clickin the 'more...' button
-        await page.waitForSelector(".w8nwRe")
-        more_btn = await element.querySelector(".w8nwRe")
-        if more_btn is not None:
+        try:
+            #handles case of review text being super long and clickin the 'more...' button
+            await page.waitForSelector(".w8nwRe")
+            more_btn = await element.querySelector(".w8nwRe")
             await page.evaluate("button => button.click()", more_btn)
             await page.waitFor(5000)
+        except:
+            pass
 
         await page.waitForSelector('.MyEned')
         snippet = await element.querySelector('.MyEned')
@@ -53,24 +56,22 @@ def summarize(reviews, model):
     prompt,
     generation_config={
         'temperature': 0,
-        'max_output_tokens': 800
+        'max_output_tokens': 300
     }
     )   
     
-    print(completion.text)
+    return completion.result
 
-
-
+genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
+model = genai.GenerativeModel('gemini-1.5-flash')
 models = [
     m for m in genai.list_models() if 'generateContent' in m.supported_generation_methods
 ]
 model = models[0].name
-print("We are using model:", model)
 
-genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
-model = genai.GenerativeModel('gemini-1.5-flash')
+url = input("Enter a Google Maps Url:")
 
 reviews = asyncio.get_event_loop().run_until_complete(scrape_reviews(url))
-print(reviews)
 
-summarize(reviews, model)
+result = summarize(reviews, model)
+print(result)
