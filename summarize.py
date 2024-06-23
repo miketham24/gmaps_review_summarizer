@@ -45,10 +45,14 @@ async def scrape_reviews(url):
     return reviews
 
 def summarize(reviews, model):
-    prompt = """I collected some reviews of a palce I was considering visting.
+    prompt = """I collected some reviews of a place I was considering visting.
                 Can you summarize the reviews for me? 
                 I want pros, cons, what people particularly loved, 
-                and what people particularly disliked."""
+                and what people particularly disliked.
+                Make sure given the context of the place, reword the category headers.
+                For example, if it is a restaurant or cafe, I would want to know the pros, cons,
+                what dishes and drinks that are recommended and not good etc. If you can, 
+                if it's a cafe, check if they have outlets and plugs."""
     for review in reviews:
         prompt += "\n" + review
 
