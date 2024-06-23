@@ -1,4 +1,4 @@
-import google.generativeai as gai
+import google.generativeai as genai
 import asyncio
 from pyppeteer import launch
 
@@ -7,7 +7,6 @@ import os
 
 load_dotenv()
 api_key = os.getenv('API_KEY')
-print(api_key)
 
 # import webbrowser
 
@@ -43,6 +42,33 @@ async def scrape_reviews(url):
 
     return reviews
 
-# def summarize(reviews, model):
+def summarize(reviews, model):
+    prompt = "I collected some reviews of a palce I was considering visting. Can you summarize the reviews for me? I want pros, cons, what people particularly loved, and what people particularly disliked."
+    for review in reviews:
+        prompt += "\n" + review
+
+    completion = model.generate_content(
+    prompt,
+    generation_config={
+        'temperature': 0,
+        'max_output_tokens': 800
+    }
+    )   
+    
+    print(completion.text)
+
+
+
+models = [
+    m for m in genai.list_models() if 'generateContent' in m.supported_generation_methods
+]
+model = models[0].name
+print("We are using model:", model)
+
+genai.configure(api_key=os.environ["API_KEY"])
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 reviews = asyncio.get_event_loop().run_until_complete(scrape_reviews(url))
+print(reviews)
+
+summarize(reviews, model)
