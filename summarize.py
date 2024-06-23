@@ -6,9 +6,8 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-api_key = os.getenv('API_KEY')
-
-# import webbrowser
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+genai.configure(api_key=GOOGLE_API_KEY)
 
 url = "https://www.google.com/maps/place/Phnom+Penh+Restaurant/@49.2784175,-123.1085087,15z/data=!3m1!4b1!4m6!3m5!1s0x5486716fe509c2b3:0x4e43d6ef30d0b5df!8m2!3d49.278418!4d-123.0982304!16s%2Fg%2F1td5lcxj?entry=ttu"
 
@@ -43,7 +42,10 @@ async def scrape_reviews(url):
     return reviews
 
 def summarize(reviews, model):
-    prompt = "I collected some reviews of a palce I was considering visting. Can you summarize the reviews for me? I want pros, cons, what people particularly loved, and what people particularly disliked."
+    prompt = """I collected some reviews of a palce I was considering visting.
+                Can you summarize the reviews for me? 
+                I want pros, cons, what people particularly loved, 
+                and what people particularly disliked."""
     for review in reviews:
         prompt += "\n" + review
 
@@ -65,7 +67,7 @@ models = [
 model = models[0].name
 print("We are using model:", model)
 
-genai.configure(api_key=os.environ["API_KEY"])
+genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 reviews = asyncio.get_event_loop().run_until_complete(scrape_reviews(url))
