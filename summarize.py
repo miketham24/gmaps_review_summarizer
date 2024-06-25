@@ -60,7 +60,7 @@ def summarize(reviews, model):
     prompt,
     generation_config={
         'temperature': 0,
-        'max_output_tokens': 800
+        'max_output_tokens': 300
     }
     )   
     
