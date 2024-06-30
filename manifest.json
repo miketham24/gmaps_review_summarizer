@@ -1,0 +1,28 @@
+{
+    "manifest_version": 3,
+    "name": "Google Maps Review Summarizer",
+    "version": "1.0",
+    "description": "Summarize Google Maps reviews using AI.",
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "storage"
+    ],
+    "background": {
+        "service_worker": "scripts/background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["*://*.google.com/maps/*"],
+            "js": ["scripts/content.js"]
+        }
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "images/icon.png",
+            "48": "images/icon.png",
+            "128": "images/icon.png"
+        }
+    }
+}
